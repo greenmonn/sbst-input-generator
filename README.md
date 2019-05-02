@@ -1,4 +1,4 @@
-# Search Based Test Data Generation
+# Search Based Test Input Generation
 
 A Python implementation of automated test data generation.
 
