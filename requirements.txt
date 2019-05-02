@@ -1,3 +1,3 @@
-astor==0.7.1
-pytest==4.2.0
-pytest-watch==4.2.0
+astor
+pytest
+pytest-watch
