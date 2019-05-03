@@ -4,12 +4,6 @@
 
 import sys
 
-def is_triangle(longest, m, n):
-  if longest < (m + n):
-    return True
-
-  return False
-
 def triangle(a, b, c):
   longest = 0
   m = 0
@@ -32,7 +26,10 @@ def triangle(a, b, c):
       longest = c
       m, n = a, b
 
-  return is_triangle(longest, m, n)
+  if longest < (m + n):
+    return True
+
+  return False
 
 
 if len(sys.argv) - 1 != 3:
