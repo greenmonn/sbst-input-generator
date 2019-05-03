@@ -21,7 +21,7 @@ def test_find_target_function():
     function_defs = find_all_function_def(body)
     target_function = find_target_function(body, function_defs)
 
-    assert 'triangle' == target_function['name']
+    assert 'triangle' == parse_name(list(astor.iter_node(target_function)))
 
 
 def test_parse_predicates():
