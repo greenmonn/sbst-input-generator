@@ -2,6 +2,15 @@ import astor
 from anytree import AnyNode
 
 
+def count_functions(functions):
+    names = []
+    for f in functions:
+        if f['name'] not in names:
+            names.append(f['name'])
+
+    return len(names)
+
+
 class TargetFunctionException(Exception):
     """Exception raised for errors in the input.
 
@@ -13,6 +22,7 @@ class TargetFunctionException(Exception):
     def __init__(self, calls, message):
         self.calls = calls
         self.message = message
+
 
 class WalkFunctionCall(astor.TreeWalk):
     def __init__(self):
@@ -30,35 +40,32 @@ class WalkFunctionCall(astor.TreeWalk):
     def pre_Call(self):
         if self.is_in_function_def:
             return
-        
+
         name = self.cur_node.func.id
         args = self.cur_node.args
 
-        self.function_call.append((name, args, self.cur_node))
-        print(name)
-        print(args)
-        print(astor.to_source(self.cur_node))
+        self.function_call.append(name)
 
     def function_call(self):
         return self.function_call
 
     def target_function(self, function_defs):
-        local_calls = []
+        called_functions = []
 
-        for f in self.function_call:
+        for name in self.function_call:
             for f_def in function_defs:
-                if f[0] == f_def[0]: # compare name
-                    local_calls.append(f_def[1])
+                if name == f_def['name']:
+                    called_functions.append(f_def)
 
-        if len(set(local_calls)) > 1:
-            raise TargetFunctionException(set(local_calls),
-                'Multiple target function detected. Provide source with only one function call in main.')
-        
-        elif len(local_calls) == 0:
-            raise TargetFunctionException(local_calls,
-                'No target function detected. Provide source with only one function call in main.')
+        if count_functions(called_functions) > 1:
+            raise TargetFunctionException(set(called_functions),
+                                          'Multiple target function detected. Provide source with only one function call in main.')
+
+        elif len(called_functions) == 0:
+            raise TargetFunctionException(called_functions,
+                                          'No target function detected. Provide source with only one function call in main.')
         else:
-            return local_calls[0]
+            return called_functions[0]
 
 
 if __name__ == "__main__":

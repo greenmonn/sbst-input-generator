@@ -9,7 +9,12 @@ class WalkFunctionDefs(astor.TreeWalk):
         self.function_definitions = []
 
     def pre_FunctionDef(self):
-        self.function_definitions.append((self.cur_node.name, self.cur_node))
+        arguments_count = len(self.cur_node.args.args)
+        function_def = {'name': self.cur_node.name,
+                        'node': self.cur_node,
+                        'args_count': arguments_count}
+
+        self.function_definitions.append(function_def)
 
     def get_function_definitions(self):
         return self.function_definitions
