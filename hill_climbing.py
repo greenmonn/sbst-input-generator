@@ -3,11 +3,12 @@ Note that it actually 'descend', to minimise fitness value.
 '''
 
 import ast
+import astor
 import sys
 import random
 from trace import Trace
 
-INT_MAX = 100
+INT_MAX = 3000
 
 INT_MIN = 0
 
@@ -17,12 +18,12 @@ def normalize(n):
   return 1.0 - (1 + alpha)**(-n)
 
 class HillClimbing():
-    def __init__(self, target_function, nodes_on_path):
+    def __init__(self, target_function, AST, nodes_on_path):
         self.function_name = target_function['name']
         self.args_count = target_function['args_count']
 
-        self.functionDef_source = function_def = compile(
-            ast.Module([target_function['node']]), '', 'exec')
+        self.functionDef_source = compile(
+            AST, '', 'exec')
 
         self.nodes_on_path = nodes_on_path
 
@@ -47,7 +48,7 @@ class HillClimbing():
     def _calculate_fitness_value(self, args):
         trace = Trace()
 
-        exec(self.functionDef_source)
+        exec(self.functionDef_source, locals())
 
         eval(self._make_function_call(args))
 
@@ -65,7 +66,6 @@ class HillClimbing():
 
             approach_level += 1
 
-        return -1
 
     def _find_neighbors(self, args):
       neighbors = []

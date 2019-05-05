@@ -14,8 +14,9 @@ class InputGenerator():
         nodes_on_path = self.parser.get_nodes_on_path(target_branch_id)
 
         target_function = self.parser.get_target_function()
+        AST = self.parser.get_module_with_target_function()
 
-        hc = HillClimbing(target_function, nodes_on_path)
+        hc = HillClimbing(target_function, AST, nodes_on_path)
 
         minimised_args, fitness_value = hc.minimise()
 
@@ -58,7 +59,7 @@ class InputGenerator():
             print(line)
 
 
-parser = ASTParser('target/triangle.py')
+parser = ASTParser('target/calender.py')
 
 generator = InputGenerator(parser)
 

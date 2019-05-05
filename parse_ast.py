@@ -12,6 +12,7 @@ class ASTParser():
         self.AST = astor.code_to_ast.parse_file(source)
         self.target_function = None
         self.predicates_tree = None
+        self.function_defs = None
 
         self._find_target_function(self.AST)
 
@@ -20,6 +21,7 @@ class ASTParser():
         walker.walk(AST)
 
         function_defs = walker.get_function_definitions()
+        self.function_defs = function_defs
 
         '''
         If targeting function of test generation isn't set,
@@ -77,6 +79,17 @@ class ASTParser():
 
     def get_target_function(self):
         return self.target_function
+
+    def get_module_with_target_function(self):
+        function_def_nodes = []
+
+        for fdef in self.function_defs:
+            if fdef['name'] == self.target_function['name']:
+                function_def_nodes.append(self.target_function['node'])
+            else:
+                function_def_nodes.append(fdef['node'])
+
+        return ast.Module(function_def_nodes)
 
 
 if __name__ == "__main__":
