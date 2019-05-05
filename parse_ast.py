@@ -50,6 +50,14 @@ class ASTParser():
 
             print("%s%s" % (pre, predicate))
 
+    def get_all_branches(self):
+        branches = []
+        for node in PreOrderIter(self.predicates_tree):
+            if node.id != None and node.type != None:
+                branches.append((node.id, node.type))
+        
+        return branches
+
     def get_nodes_on_path(self, target_branch_id):
         branch_type = True if target_branch_id[-1] == 'T' else False
         branch_num = int(target_branch_id[:-1])
@@ -58,10 +66,8 @@ class ASTParser():
         for node in PreOrderIter(self.predicates_tree):
             if node.id == branch_num and node.type == branch_type:
                 target_node = node
-        print(target_node)
 
         w = Walker()
-        print(w.walk(self.predicates_tree, target_node))
         nodes_on_path = [(node.id, node.type) for node in w.walk(self.predicates_tree, target_node)[2]]
 
         nodes_on_path.reverse()
