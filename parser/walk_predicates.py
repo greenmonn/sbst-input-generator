@@ -21,7 +21,7 @@ class WalkPredicates(astor.TreeWalk):
         astor.TreeWalk.__init__(self)
 
         self.predicates_stack = []
-        self.predicates_tree_root = AnyNode(ast_node=None, id=None, type=None)
+        self.branch_tree_root = AnyNode(ast_node=None, id=None, type=None)
         self.cur_branch_id = 0
 
         self.false_branches_stack = []
@@ -78,7 +78,7 @@ class WalkPredicates(astor.TreeWalk):
     def pre_If(self):
         self.cur_branch_id += 1
 
-        parent = self.predicates_tree_root
+        parent = self.branch_tree_root
         if len(self.predicates_stack) > 0:
             true_node, false_node = self.predicates_stack[-1]
             if len(self.false_branches_stack) == 0:
@@ -113,5 +113,5 @@ class WalkPredicates(astor.TreeWalk):
     def post_If(self):
         self.predicates_stack.pop()
 
-    def predicates_tree(self):
-        return self.predicates_tree_root
+    def get_branch_tree(self):
+        return self.branch_tree_root

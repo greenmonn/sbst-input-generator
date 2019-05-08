@@ -1,11 +1,12 @@
 import pytest
 import astor
-from parse_ast import *
 
-AST = astor.code_to_ast.parse_file('target/triangle.py')
+from covgen.parser import ast_parser
+
+parser = ASTParser('target/triangle.py')
 
 
-def test_find_all_function_def():
+def test_parse_function_def():
     attributes = astor.iter_node(AST)
     body = parse_body(attributes)
 
@@ -22,7 +23,3 @@ def test_find_target_function():
     target_function = find_target_function(body, function_defs)
 
     assert 'triangle' == parse_name(list(astor.iter_node(target_function)))
-
-
-def test_parse_predicates():
-    pass

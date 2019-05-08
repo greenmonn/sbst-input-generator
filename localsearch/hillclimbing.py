@@ -6,12 +6,12 @@ import ast
 import astor
 import sys
 import random
-from trace import Trace
+from covgen.trace.trace import Trace
 
 INT_MAX = 3000
 INT_MIN = 0
 
-MAX_RETRY_COUNT = 1
+MAX_RETRY_COUNT = 10
 
 def normalize(n):
   alpha = 0.001
@@ -113,6 +113,6 @@ class HillClimbing():
             minimised_args, fitness_value = self.do_hill_descending(initial_args)
 
             if fitness_value == 0:
-                break
+                break 
 
         return (minimised_args, fitness_value)

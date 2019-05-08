@@ -1,12 +1,23 @@
-from parse_ast import ASTParser
+import sys
 
-from hill_climbing import HillClimbing
+from covgen.parser.ast_parser import ASTParser, NoTargetFunctionException
+from covgen.localsearch.hillclimbing import HillClimbing
 
 
 class InputGenerator():
-    def __init__(self, parser):
+    def __init__(self, file, function_name=None):
+        parser = ASTParser(file)
+        target_function = None
+
+        try:
+            parser.set_target_function(function_name)
+
+        except NoTargetFunctionException as err:
+            print('{}: {}'.format(err.message, err.name))
+            exit(1)
+
         parser.insert_hooks()
-        # parser.print_predicates_tree()
+        parser.print_predicates_tree()
 
         self.parser = parser
 
@@ -20,9 +31,6 @@ class InputGenerator():
 
         minimised_args, fitness_value = hc.minimise()
 
-        # print(minimised_args)
-        # print(fitness_value)
-
         if fitness_value == 0:
             return minimised_args
 
@@ -31,7 +39,6 @@ class InputGenerator():
 
     def generate_all_inputs(self):
         branches = self.parser.get_all_branches()
-        # target function의 모든 branch들에 대해서 (1T, 1F, ...)
 
         all_inputs = {}
 
@@ -59,8 +66,16 @@ class InputGenerator():
             print(line)
 
 
-parser = ASTParser('target/calender.py')
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print('Usage: python inputgenerator.py <target file location>')
+        print(
+            '       python inputgenerator.py <target file location> <target function name>')
+        exit(1)
 
-generator = InputGenerator(parser)
+    target_file = sys.argv[1]
+    target_function = None if len(sys.argv) != 3 else sys.argv[2]
 
-generator.generate_all_inputs_and_print()
+    generator = InputGenerator(target_file, target_function)
+
+    generator.generate_all_inputs_and_print()
