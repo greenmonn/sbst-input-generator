@@ -9,8 +9,9 @@ import random
 from trace import Trace
 
 INT_MAX = 3000
-
 INT_MIN = 0
+
+MAX_RETRY_COUNT = 1
 
 def normalize(n):
   alpha = 0.001
@@ -57,11 +58,11 @@ class HillClimbing():
         approach_level = 0
         for branch_num, branch_type in self.nodes_on_path:
             for num, result, distance_to_alternative in executed_branches:
-                if branch_num == num:
-                    if approach_level == 0 and branch_type == result:
+                if approach_level == 0:
+                    if branch_num == num and branch_type == result:
                         return 0
 
-                if branch_type != result:
+                if branch_num == num and branch_type != result:
                     return normalize(distance_to_alternative) + approach_level
 
             approach_level += 1
@@ -103,8 +104,15 @@ class HillClimbing():
                 fitness = new_args[0][1]
 
     def minimise(self):
-        initial_args = self._generate_random_integers(self.args_count)
+        minimised_args = []
+        fitness_value = 0
 
-        minimised_args, fitness_value = self.do_hill_descending(initial_args)
+        for i in range(MAX_RETRY_COUNT):
+            initial_args = self._generate_random_integers(self.args_count)
+
+            minimised_args, fitness_value = self.do_hill_descending(initial_args)
+
+            if fitness_value == 0:
+                break
 
         return (minimised_args, fitness_value)
