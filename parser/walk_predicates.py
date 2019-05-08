@@ -1,6 +1,7 @@
 import ast
 import astor
-from anytree import AnyNode
+
+from covgen.types.branch_tree import BranchNode, BranchTree
 
 
 class NotInterceptableException(Exception):
@@ -21,8 +22,8 @@ class WalkPredicates(astor.TreeWalk):
         astor.TreeWalk.__init__(self)
 
         self.predicates_stack = []
-        self.branch_tree_root = AnyNode(ast_node=None, id=None, type=None)
-        self.cur_branch_id = 0
+        self.branch_tree = BranchTree()
+        self.cur_branch_num = 0
 
         self.false_branches_stack = []
 
@@ -76,36 +77,37 @@ class WalkPredicates(astor.TreeWalk):
         return f_call_node
 
     def pre_If(self):
-        self.cur_branch_id += 1
+        self.cur_branch_num += 1
 
-        parent = self.branch_tree_root
+        parent = self.branch_tree.root
+
         if len(self.predicates_stack) > 0:
             true_node, false_node = self.predicates_stack[-1]
             if len(self.false_branches_stack) == 0:
                 parent = true_node
 
-            elif self.false_branches_stack[-1] == self.cur_branch_id - 1:
+            elif self.false_branches_stack[-1] == self.cur_branch_num - 1:
                 parent = false_node
             else:
                 parent = true_node
 
         try:
             self.cur_node.test = self._inject_trace_hook(
-                self.cur_node.test, self.cur_branch_id)
-        
+                self.cur_node.test, self.cur_branch_num)
+
         except NotInterceptableException as err:
-            print(err)
+            print('{}: {}'.format(err.message, err.predicate))
             exit(1)
 
-        true_branch_node = AnyNode(
-            id=self.cur_branch_id, type=True, ast_node=self.cur_node, parent=parent)
-        false_branch_node = AnyNode(
-            id=self.cur_branch_id, type=False, ast_node=self.cur_node, parent=parent)
+        true_branch_node = BranchNode(
+            num=self.cur_branch_num, type=True, ast_node=self.cur_node, parent=parent)
+        false_branch_node = BranchNode(
+            num=self.cur_branch_num, type=False, ast_node=self.cur_node, parent=parent)
 
         self.predicates_stack.append((true_branch_node, false_branch_node))
 
     def pre_orelse_name(self):
-        self.false_branches_stack.append(self.cur_branch_id)
+        self.false_branches_stack.append(self.cur_branch_num)
 
     def post_orelse_name(self):
         self.false_branches_stack.pop()
@@ -114,4 +116,4 @@ class WalkPredicates(astor.TreeWalk):
         self.predicates_stack.pop()
 
     def get_branch_tree(self):
-        return self.branch_tree_root
+        return self.branch_tree

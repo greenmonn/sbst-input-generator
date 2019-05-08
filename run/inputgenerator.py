@@ -1,33 +1,38 @@
 import sys
 
 from covgen.parser.ast_parser import ASTParser, NoTargetFunctionException
+
+from covgen.types.function_def import FunctionDef
+from covgen.types.branch_tree import BranchTree
+
 from covgen.localsearch.hillclimbing import HillClimbing
+from covgen.localsearch.fitnesscalc import FitnessCalculator
+
 
 
 class InputGenerator():
     def __init__(self, file, function_name=None):
         parser = ASTParser(file)
-        target_function = None
+        self.function_defs = parser.function_defs
+        self.target_function = None
 
         try:
-            parser.set_target_function(function_name)
+            self.target_function = parser.get_target_function_definition(
+                function_name)
 
         except NoTargetFunctionException as err:
             print('{}: {}'.format(err.message, err.name))
             exit(1)
 
-        parser.insert_hooks()
-        parser.print_predicates_tree()
+        self.target_function.insert_hooks_on_predicates()
 
-        self.parser = parser
+        self.target_function.branch_tree.print()
 
     def generate_input(self, target_branch_id):
-        nodes_on_path = self.parser.get_nodes_on_path(target_branch_id)
+        fitness_calculator = FitnessCalculator(
+            self.target_function, target_branch_id, self.function_defs)
 
-        target_function = self.parser.get_target_function()
-        AST = self.parser.get_module_with_target_function()
-
-        hc = HillClimbing(target_function, AST, nodes_on_path)
+        hc = HillClimbing(fitness_calculator)
 
         minimised_args, fitness_value = hc.minimise()
 
@@ -38,7 +43,9 @@ class InputGenerator():
             return None
 
     def generate_all_inputs(self):
-        branches = self.parser.get_all_branches()
+        branch_tree = self.target_function.branch_tree
+
+        branches = branch_tree.get_all_branches()
 
         all_inputs = {}
 
