@@ -37,3 +37,6 @@ class FitnessCalculator():
                     return normalize(distance_to_alternative) + approach_level
 
             approach_level += 1
+        
+        # no executed branch on target branch path
+        return 10000
