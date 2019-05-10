@@ -1,4 +1,4 @@
-import covgen.trace.distance_functions as df
+import covgen.localsearch.distance_functions as df
 
 
 class Trace():

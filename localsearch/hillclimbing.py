@@ -2,11 +2,8 @@
 Note that it actually 'descend', to minimise fitness value.
 '''
 
-import ast
-import astor
 import sys
 import random
-from covgen.trace.trace import Trace
 
 INT_MAX = 3000
 INT_MIN = 0

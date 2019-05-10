@@ -1,4 +1,4 @@
-from covgen.trace.trace import Trace
+from covgen.localsearch.trace import Trace
 
 
 def normalize(n):
