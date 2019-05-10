@@ -36,17 +36,23 @@ def find_day_string(year, month, date):
     ]
 
     days = 0
-    for y in range(min(year, 2019), max(year, 2019)):
+    y = beforeYear = min(year, 2019)
+    afterYear = max(year, 2019)
+
+    while (y < afterYear):
         if is_leap_year(y):
             days += 366
 
         else:
             days += 365
 
+        y += 1
+
     if year < 2019:
         days = -days
 
-    for m in range(1, month):
+    m = 1
+    while (m < month):
         if m == 2:
             if is_leap_year(year):
                 days += 29
@@ -77,6 +83,8 @@ def find_day_string(year, month, date):
 
         else:
             days += 30
+
+        m += 1
 
     days += date - 1
 
