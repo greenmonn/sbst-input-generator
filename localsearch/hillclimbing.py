@@ -8,12 +8,11 @@ import random
 INT_MAX = 3000
 INT_MIN = 0
 
-MAX_RETRY_COUNT = 10
-
 
 class HillClimbing():
-    def __init__(self, fitness_calculator):
+    def __init__(self, fitness_calculator, retry_count=10):
         self.fitness = fitness_calculator
+        self.retry_count = retry_count
 
     def _generate_random_integers(self, count):
         args = []
@@ -63,7 +62,7 @@ class HillClimbing():
         minimised_args = []
         fitness_value = 0
 
-        for i in range(MAX_RETRY_COUNT):
+        for i in range(self.retry_count):
             initial_args = self._generate_random_integers(
                 self.fitness.get_args_count())
 

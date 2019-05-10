@@ -6,6 +6,7 @@ from covgen.parser.ast_parser import ASTParser
 
 from covgen.localsearch.fitnesscalc import FitnessCalculator
 from covgen.localsearch.hillclimbing import HillClimbing
+from covgen.localsearch.avm import AVM
 
 
 class NoTargetFunctionException(Exception):
@@ -22,9 +23,11 @@ class NoTargetFunctionException(Exception):
 
 
 class InputGenerator():
-    def __init__(self, file, function_name=None):
+    def __init__(self, file, function_name=None, method=None, retry=10):
         parser = ASTParser(file)
 
+        self.method = method
+        self.retry_count = retry
         self.function_defs = parser.function_defs
         self.target_function = None
 
@@ -43,19 +46,35 @@ class InputGenerator():
 
                 target_function.insert_hooks_on_predicates()
                 self.target_function = target_function
-                self.target_function.branch_tree.print()
+                # self.target_function.branch_tree.print()
                 return
 
         raise NoTargetFunctionException(
             name, 'Cannot find target function definition with given name')
-        
+
     def generate_input(self, target_branch_id):
         fitness_calculator = FitnessCalculator(
             self.target_function, target_branch_id, self.function_defs)
 
-        hc = HillClimbing(fitness_calculator)
+        searcher = None
+        if self.method == 'avm':
+            searcher = AVM(fitness_calculator, self.retry_count)
 
-        minimised_args, fitness_value = hc.minimise()
+        elif self.method == 'hillclimbing':
+            searcher = HillClimbing(fitness_calculator, self.retry_count)
+
+        else:
+            # mix possible methods
+            searcher = AVM(fitness_calculator, self.retry_count)
+            minimised_args, fitness_value = searcher.minimise()
+
+            if fitness_value == 0:
+                return minimised_args
+
+            else:
+                searcher = HillClimbing(fitness_calculator, self.retry_count)
+
+        minimised_args, fitness_value = searcher.minimise()
 
         if fitness_value == 0:
             return minimised_args
@@ -108,7 +127,7 @@ class InputGenerator():
             return bnum * 2
         elif id[-1] == 'F':
             return bnum * 2 + 1
-    
+
     def generate_all_inputs_and_print(self):
         all_inputs = self.generate_all_inputs()
 
@@ -127,20 +146,52 @@ class InputGenerator():
                         line += ' {}'.format(arg)
 
                 print(line)
-        
+
             print('')
 
 
-if __name__ == "__main__":
+def print_help():
+    print('Usage: python inputgenerator.py <target file location>')
+    print(
+        '       python inputgenerator.py <target file location> --function <target function name> --method <method name=avm or hillclimbing> --retry-count <retry_count>')
+    print(
+        '       python inputgenerator.py <target file location> -f <target function name> -m <method name=avm or hillclimbing> -r <retry_count>')
+
+
+def execute():
     if len(sys.argv) < 2:
-        print('Usage: python inputgenerator.py <target file location>')
-        print(
-            '       python inputgenerator.py <target file location> <target function name>')
+        print_help()
         exit(1)
 
     target_file = sys.argv[1]
-    target_function = None if len(sys.argv) != 3 else sys.argv[2]
+    target_function = None
+    search_method = None
+    retry_count = 10
 
-    generator = InputGenerator(target_file, target_function)
+    index = 2
+    while index + 1 < len(sys.argv):
+        option = sys.argv[index]
+        if option == '-f' or option == '--function':
+            target_function = sys.argv[index+1]
+
+        elif option == '-m' or option == '--method':
+            search_method = sys.argv[index+1]
+
+        elif option == '-r' or option == '--retry-count':
+            retry_count = int(sys.argv[index+1])
+
+        else:
+            print('unknown option: {}'.format(option))
+            print_help()
+            exit(1)
+
+        index = index + 2
+
+    generator = InputGenerator(
+        target_file, target_function, method=search_method, retry=retry_count)
 
     generator.generate_all_inputs_and_print()
+
+
+if __name__ == "__main__":
+    execute()
