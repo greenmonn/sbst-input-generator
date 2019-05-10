@@ -44,7 +44,6 @@ class WalkPredicates(astor.TreeWalk):
         if not hasattr(compare_node, 'left') or not hasattr(compare_node, 'comparators'):
             op = 'is_true'
             arg = astor.to_source(compare_node).rstrip()
-            rhs = True
 
             f_call = 'trace.{fname}({branch_id}, {arg})'.format(
                 fname=op, branch_id=branch_id, arg=arg)

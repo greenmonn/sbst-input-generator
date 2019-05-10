@@ -1,5 +1,4 @@
 import astor
-import ast
 
 from covgen.parser.walk_functiondefs import WalkFunctionDefs
 
