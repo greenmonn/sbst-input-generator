@@ -1,2 +1,5 @@
 .pytest_cache/
 __pycache__/
+build
+dist
+/sbst_input_generator.egg-info
