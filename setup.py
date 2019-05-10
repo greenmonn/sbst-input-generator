@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="sbst-input-generator",
+    name="covgen",
     version="0.0.1",
     author="Greenmon",
     author_email="greenmon@kaist.ac.kr",
