@@ -25,7 +25,7 @@ class NoTargetFunctionException(Exception):
 
 
 class InputGenerator():
-    def __init__(self, file, function_name=None, method=None, retry=100):
+    def __init__(self, file, function_name=None, method=None, retry=100, int_min=0, int_max=3000):
         parser = ASTParser(file)
 
         self.method = method
@@ -48,7 +48,7 @@ class InputGenerator():
 
                 target_function.insert_hooks_on_predicates()
                 self.target_function = target_function
-                self.target_function.branch_tree.print()
+                # self.target_function.branch_tree.print()
                 return
 
         raise NoTargetFunctionException(
@@ -154,7 +154,7 @@ class InputGenerator():
 def print_help():
     print('Usage: python inputgenerator.py <target file location>')
     print(
-        '       python inputgenerator.py <target file location> --function <target function name> --method <method name=avm or hillclimbing> --retry-count <retry_count>')
+        '       python inputgenerator.py <target file location> --function <target function name> --method <method name=avm or hillclimbing> --retry-count <retry_count> --int-min <minimum int> --int-max <maximum int>')
     print(
         '       python inputgenerator.py <target file location> -f <target function name> -m <method name=avm or hillclimbing> -r <retry_count>')
 
@@ -168,6 +168,8 @@ def execute():
     target_function = None
     search_method = None
     retry_count = 100
+    int_min = 0
+    int_max = 3000
 
     index = 2
     while index + 1 < len(sys.argv):
@@ -180,6 +182,12 @@ def execute():
 
         elif option == '-r' or option == '--retry-count':
             retry_count = int(sys.argv[index+1])
+
+        elif option == '--int-min':
+            int_min = int(sys.argv[index+1])
+        
+        elif option == '--int-max':
+            int_max = int(sys.argv[index+1])
 
         else:
             print('unknown option: {}'.format(option))

@@ -10,14 +10,17 @@ INT_MIN = 0
 
 
 class HillClimbing():
-    def __init__(self, fitness_calculator, retry_count=10):
+    def __init__(self, fitness_calculator, retry_count=100, int_min=0, int_max=3000):
         self.fitness = fitness_calculator
         self.retry_count = retry_count
+
+        self.int_min = int_min
+        self.int_max = int_max
 
     def _generate_random_integers(self, count):
         args = []
         for i in range(count):
-            integer = random.randint(INT_MIN, INT_MAX)
+            integer = random.randint(self.int_min, self.int_max)
             args.append(integer)
 
         return args
