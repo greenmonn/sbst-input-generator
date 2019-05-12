@@ -25,12 +25,13 @@ class HillClimbing():
     def _find_neighbors(self, args):
         neighbors = []
         for i in range(len(args)):
-            neighbor = args[:]
-            neighbor[i] = args[i] + 1
-            neighbors.append(neighbor)
+            neighbor1 = args[:]
+            neighbor1[i] = args[i] + 1
+            neighbors.append(neighbor1)
 
-            neighbor[i] = args[i] - 1
-            neighbors.append(neighbor)
+            neighbor2 = args[:]
+            neighbor2[i] = args[i] - 1
+            neighbors.append(neighbor2)
 
         return neighbors
 
