@@ -2,6 +2,8 @@ import sys
 import copy
 import operator
 
+import covgen.types.branchutil as branchutil
+
 from covgen.parser.ast_parser import ASTParser
 
 from covgen.localsearch.fitnesscalc import FitnessCalculator
@@ -23,7 +25,7 @@ class NoTargetFunctionException(Exception):
 
 
 class InputGenerator():
-    def __init__(self, file, function_name=None, method=None, retry=10):
+    def __init__(self, file, function_name=None, method=None, retry=100):
         parser = ASTParser(file)
 
         self.method = method
@@ -46,13 +48,17 @@ class InputGenerator():
 
                 target_function.insert_hooks_on_predicates()
                 self.target_function = target_function
-                # self.target_function.branch_tree.print()
+                self.target_function.branch_tree.print()
                 return
 
         raise NoTargetFunctionException(
             name, 'Cannot find target function definition with given name')
 
     def generate_input(self, target_branch_id):
+        if self.target_function is None:
+            print('Please set target function!')
+            return
+
         fitness_calculator = FitnessCalculator(
             self.target_function, target_branch_id, self.function_defs)
 
@@ -100,13 +106,19 @@ class InputGenerator():
             inputs = {}
 
             for branch in branches:
-                branch_type = 'T' if branch[1] is True else 'F'
+                branch_id = branchutil.create_branch_id(branch)
 
-                branch_id = '{num}{type}'.format(
-                    num=branch[0], type=branch_type)
                 args = self.generate_input(branch_id)
 
                 inputs[branch_id] = args
+
+                parents = branch_tree.get_nodes_on_path(branch_id)[1:]
+
+                for branch in parents:
+                    parent_id = branchutil.create_branch_id(branch)
+
+                    if inputs[parent_id] == None:
+                        inputs[parent_id] = args
 
             all_inputs[self.target_function.name] = inputs
 
@@ -117,17 +129,6 @@ class InputGenerator():
 
         return all_inputs
 
-    def _compare_branch_id(self, item):
-        id = item[0]
-
-        bnum = int(id[:-1])
-        btype = id[-1]
-
-        if btype == 'T':
-            return bnum * 2
-        elif id[-1] == 'F':
-            return bnum * 2 + 1
-
     def generate_all_inputs_and_print(self):
         all_inputs = self.generate_all_inputs()
 
@@ -137,7 +138,7 @@ class InputGenerator():
             if len(inputs.items()) == 0:
                 print('no branch detected')
 
-            for branch_id, args in sorted(inputs.items(), key=self._compare_branch_id):
+            for branch_id, args in sorted(inputs.items(), key=branchutil.compare_branch_id):
                 line = '{}:'.format(branch_id)
                 if args is None:
                     line += ' -'
@@ -166,7 +167,7 @@ def execute():
     target_file = sys.argv[1]
     target_function = None
     search_method = None
-    retry_count = 10
+    retry_count = 100
 
     index = 2
     while index + 1 < len(sys.argv):

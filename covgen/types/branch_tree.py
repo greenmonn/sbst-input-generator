@@ -1,6 +1,8 @@
 import astor
 from anytree import NodeMixin, RenderTree, Walker, PreOrderIter
 
+import covgen.types.branchutil as branchutil
+
 
 class BranchNode(NodeMixin):
     def __init__(self, num, type=None, ast_node=None, parent=None):
@@ -33,9 +35,18 @@ class BranchTree():
 
         return branches
 
+    def get_leaf_branches(self):
+        branches = []
+
+        for node in PreOrderIter(self.root):
+            if node.is_leaf and node.num != None and node.type != None:
+                branches.append((node.num, node.type))
+
+        return branches
+
     def get_nodes_on_path(self, target_branch_id):
-        branch_type = True if target_branch_id[-1] == 'T' else False
-        branch_num = int(target_branch_id[:-1])
+        branch_type = branchutil.parse_branch_type(target_branch_id)
+        branch_num = branchutil.parse_branch_num(target_branch_id)
 
         target_node = None
         for node in PreOrderIter(self.root):
