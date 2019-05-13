@@ -4,3 +4,4 @@ build
 dist
 /sbst_input_generator.egg-info
 /covgen.egg-info
+covgen/test

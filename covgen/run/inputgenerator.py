@@ -49,8 +49,7 @@ class InputGenerator():
 
                 target_function.insert_hooks_on_predicates()
                 self.target_function = target_function
-
-                self.target_function.branch_tree.print()
+                # self.target_function.branch_tree.print()
                 return
 
         raise NoTargetFunctionException(
