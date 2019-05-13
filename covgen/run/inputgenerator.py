@@ -31,6 +31,7 @@ class InputGenerator():
         self.method = method
         self.retry_count = retry
         self.function_defs = parser.function_defs
+        self.AST = parser.AST
         self.target_function = None
 
         if function_name is not None:
@@ -65,7 +66,7 @@ class InputGenerator():
             return
 
         fitness_calculator = FitnessCalculator(
-            self.target_function, target_branch_id, self.function_defs)
+            self.target_function, target_branch_id, self.AST)
 
         searcher = None
         if self.method == 'avm':

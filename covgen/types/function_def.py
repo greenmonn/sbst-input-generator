@@ -1,6 +1,5 @@
 from covgen.parser.walk_predicates import WalkPredicates
-
-import ast
+from covgen.parser.walk_targetfunc import WalkTargetFunction
 
 
 class FunctionDef():
@@ -16,20 +15,11 @@ class FunctionDef():
 
         self.branch_tree = walker.get_branch_tree()
 
-    def to_source(self, function_defs):
-        # TODO: handle import, global variables.. etc
-        # Just 'substitute' functionDef node of target function, with all other nodes remaining as the same.
+    def to_source(self, AST):
+        walker = WalkTargetFunction(self)
+        walker.walk(AST)
 
-        function_def_nodes = []
-
-        for f in function_defs:
-            if f.name == self.name:
-                function_def_nodes.append(self.node)
-            else:
-                function_def_nodes.append(f.node)
-
-        return compile(
-            ast.Module(function_def_nodes), '', 'exec')
+        return compile(AST, '', 'exec')
 
     def call(self, args):
         source = '{func}('.format(func=self.name)
