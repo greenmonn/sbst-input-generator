@@ -1,6 +1,9 @@
 from covgen.parser.walk_predicates import WalkPredicates
 from covgen.parser.walk_targetfunc import WalkTargetFunction
 
+import copy
+import astor
+
 
 class FunctionDef():
     def __init__(self, node, name, args_count):
@@ -17,6 +20,9 @@ class FunctionDef():
 
     def to_source(self, AST):
         walker = WalkTargetFunction(self)
+
+        AST = copy.deepcopy(AST)
+
         walker.walk(AST)
 
         return compile(AST, '', 'exec')
