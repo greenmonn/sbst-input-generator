@@ -19,15 +19,23 @@ If directly clone the source and run package, run below command on project root 
 python -m covgen <file>
 ```
 
-Additional options can be given:
+Additional options can be given (you can remain it as default value):
 
 ```
-python -m covgen <file> --function (-f) <target_function_name> --method (-m) <avm or hillclimbing> --retry-count (-r) <number>
+--function (-f) <target_function_name> 
+
+--method (-m) <avm or hillclimbing> 
+
+--retry-count (-r) <retry count> 
+
+--int-min <minimum value of initial arguments for heuristic methods> 
+
+--int-max <maximum value of initial arguments for heuristic methods>
 ```
 
 For example:
 ```
-python -m covgen target/calender.py -m avm --retry-count 10
+python -m covgen target/triangle.py -m avm --retry-count 10 --int-min 0 --int-max 1000
 ```
 
 prints out list of generated inputs that cover detected branches,
