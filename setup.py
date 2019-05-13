@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="covgen",
-    version="0.0.1",
+    version="0.0.3",
     author="Greenmon",
     author_email="greenmon@kaist.ac.kr",
     description="Tool for search based test data generation",

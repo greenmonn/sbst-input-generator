@@ -46,6 +46,13 @@ from each function defined in the target file.
 
 This input generator package is available on PyPI of name `covgen`. 
 
+After installing the dependencies:
+
+```
+pip install anytree
+pip install astor
+```
+
 You can install this package with below command:
 
 ```

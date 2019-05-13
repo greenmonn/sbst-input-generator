@@ -59,7 +59,7 @@ class AVM():
         fitness = 0
 
         index = 0
-        for i in range(self.retry_count):
+        for i in range(max(len(args), self.retry_count)):
             minimised_args, fitness = self.search_on_one_argument(args, index)
             if fitness == 0:
                 return minimised_args, fitness
