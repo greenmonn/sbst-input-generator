@@ -48,11 +48,16 @@ class InputGenerator():
 
                 target_function.insert_hooks_on_predicates()
                 self.target_function = target_function
-                # self.target_function.branch_tree.print()
+
+                self.target_function.branch_tree.print()
                 return
 
         raise NoTargetFunctionException(
             name, 'Cannot find target function definition with given name')
+
+    def print_branch_tree(self):
+        if self.target_function is not None:
+            self.target_function.branch_tree.print()
 
     def generate_input(self, target_branch_id):
         if self.target_function is None:
@@ -168,8 +173,8 @@ def execute():
     target_function = None
     search_method = None
     retry_count = 100
-    int_min = 0
-    int_max = 3000
+    int_min = -10000
+    int_max = 10000
 
     index = 2
     while index + 1 < len(sys.argv):

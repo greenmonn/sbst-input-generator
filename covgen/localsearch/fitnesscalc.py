@@ -1,10 +1,12 @@
 from covgen.localsearch.trace import Trace
 
+import logging
+
 
 def normalize(n):
     alpha = 0.001
 
-    return 1.0 - (1 + alpha)**(-n)
+    return 1.0 - pow(1 + alpha, -n)
 
 
 class FitnessCalculator():
@@ -36,6 +38,9 @@ class FitnessCalculator():
         for branch_num, branch_type in self.nodes_on_path:
             for num, result, distance_to_alternative in executed_branches:
                 if branch_num == num and branch_type != result:
+                    
+                    logging.debug((branch_num, result, distance_to_alternative))
+
                     return normalize(distance_to_alternative) + approach_level
 
             approach_level += 1

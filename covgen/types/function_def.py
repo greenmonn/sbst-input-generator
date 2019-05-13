@@ -9,10 +9,6 @@ class FunctionDef():
         self.name = name
         self.args_count = args_count
         self.branch_tree = None
-        self.source = None
-
-    def set_compilable_source(self, source):
-        self.source = source
 
     def insert_hooks_on_predicates(self):
         walker = WalkPredicates()

@@ -5,8 +5,7 @@ Note that it actually 'descend', to minimise fitness value.
 import sys
 import random
 
-INT_MAX = 3000
-INT_MIN = 0
+import logging
 
 
 class HillClimbing():
@@ -61,6 +60,8 @@ class HillClimbing():
 
                 args = new_args[0][0]
                 fitness = new_args[0][1]
+                
+                logging.debug((args, fitness))
 
     def minimise(self):
         minimised_args = []

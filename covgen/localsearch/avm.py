@@ -1,8 +1,7 @@
 import sys
 import random
 
-INT_MAX = 3000
-INT_MIN = 0
+import logging
 
 
 class AVM():
@@ -33,6 +32,10 @@ class AVM():
         x = args[index]
 
         while fitness > 0:
+            new_args = args[:]
+            new_args[index] = x
+            logging.debug((new_args, fitness))
+
             fitness_left = self.calculate_fitness(args, index, x - 1)
             fitness_right = self.calculate_fitness(args, index, x + 1)
 
@@ -66,7 +69,14 @@ class AVM():
         return minimised_args, fitness
 
     def minimise(self):
-        initial_args = self._generate_random_integers(
-            self.fitness.get_args_count())
+        minimised_args = []
+        fitness = 10000
+        for i in range(self.retry_count):
+            initial_args = self._generate_random_integers(
+                self.fitness.get_args_count())
 
-        return self.do_avm(initial_args)
+            minimised_args, fitness = self.do_avm(initial_args)
+            if fitness == 0:
+                return minimised_args, fitness
+        
+        return minimised_args, fitness
