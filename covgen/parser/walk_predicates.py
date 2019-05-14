@@ -78,6 +78,9 @@ class WalkPredicates(astor.TreeWalk):
     def _pre_Conditional_statement(self):
         self.cur_branch_num += 1
 
+        if len(self.cur_node.orelse) > 0:
+            self.cur_node.orelse[0].flag = True
+
         parent = self.branch_tree.root
 
         if len(self.predicates_stack) > 0:
@@ -119,10 +122,13 @@ class WalkPredicates(astor.TreeWalk):
         self._post_Conditional_statement()
 
     def pre_orelse_name(self):
-        self.false_branches_stack.append(self.cur_branch_num)
+        if len(self.cur_node) > 0 and hasattr(self.cur_node[0], 'flag') and self.cur_node[0].flag == True:
+            self.false_branches_stack.append(self.cur_branch_num)
 
     def post_orelse_name(self):
-        self.false_branches_stack.pop()
+        if len(self.cur_node) > 0 and hasattr(self.cur_node[0], 'flag') and self.cur_node[0].flag == True:
+            self.cur_node[0].flag == False
+            self.false_branches_stack.pop()
 
     def get_branch_tree(self):
         return self.branch_tree
